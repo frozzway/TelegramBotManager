@@ -3,6 +3,9 @@ from pydantic import BaseModel, ConfigDict, EmailStr
 from bot_manager.roles import Role
 
 
+__all__ = ['UserCreate', 'User', 'UserJWT', 'Token', 'Login']
+
+
 class UserCreate(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
