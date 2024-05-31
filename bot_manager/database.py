@@ -1,5 +1,3 @@
-import asyncio
-import functools
 from typing import AsyncGenerator, Annotated
 
 from fastapi import Depends
@@ -24,16 +22,15 @@ async_url_object = URL.create(
 )
 
 async_engine = create_async_engine(async_url_object, pool_size=5, max_overflow=0, pool_timeout=3600)
-AsyncSessionMaker = async_sessionmaker(async_engine, expire_on_commit=False)
+ManagerSessionMaker = async_sessionmaker(async_engine, expire_on_commit=False)
 
 
-async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
-    session = AsyncSessionMaker()
+async def get_manager_session() -> AsyncGenerator[AsyncSession, None]:
+    session = ManagerSessionMaker()
     await session.begin()
     try:
         yield session
     finally:
         await session.close()
 
-
-ControllerSession = Annotated[AsyncSession, Depends(get_async_session)]
+ManagerSession = Annotated[AsyncSession, Depends(get_manager_session)]

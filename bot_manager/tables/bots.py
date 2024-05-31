@@ -1,18 +1,12 @@
-from datetime import datetime
-from typing import Union
-
-from sqlalchemy import ForeignKey, Table, Column, TIMESTAMP
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, DeclarativeBase
-from sqlalchemy.orm import mapped_column, relationship
+from sqlalchemy.orm import mapped_column
 
-from bot_manager.roles import Role as RoleEnum
+
+__all__ = ['AiogramBase', 'ScenarioButton', 'Button', 'LinkButton', 'Category', 'Element', 'Ownership']
 
 
 class AiogramBase(DeclarativeBase):
-    pass
-
-
-class ControllerBase(DeclarativeBase):
     pass
 
 
@@ -76,59 +70,4 @@ class Ownership(AiogramBase):
     position_y: Mapped[int] = mapped_column(comment='Позиция элемента в категории (номер строки)')
 
 
-Element = Union[Category, LinkButton, ScenarioButton]
-
-
-class Bot(ControllerBase):
-    __tablename__ = 'Bots'
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column()
-    database: Mapped[str] = mapped_column()
-
-
-user_role_table = Table(
-    "UserRoles",
-    ControllerBase.metadata,
-    Column("UserId", ForeignKey("Users.id")),
-    Column("RoleId", ForeignKey("Roles.id")),
-)
-
-
-class User(ControllerBase):
-    __tablename__ = 'Users'
-    id: Mapped[int] = mapped_column(primary_key=True)
-
-    name: Mapped[str] = mapped_column()
-    middle_name: Mapped[str] = mapped_column()
-    surname: Mapped[str] = mapped_column()
-    hashed_password: Mapped[str] = mapped_column()
-    email: Mapped[str] = mapped_column()
-
-    roles: Mapped[set['Role']] = relationship(secondary=user_role_table, lazy='selectin')
-
-
-class RefreshSession(ControllerBase):
-    __tablename__ = 'RefreshSessions'
-    id: Mapped[int] = mapped_column(primary_key=True)
-
-    user_id: Mapped[int] = mapped_column(ForeignKey('Users.id'))
-    token_hash: Mapped[str] = mapped_column()
-    created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True))
-    expires_in: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True))
-    ip_address: Mapped[str] = mapped_column()
-    user_agent: Mapped[str] = mapped_column()
-
-
-class Role(ControllerBase):
-    __tablename__ = 'Roles'
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column()
-
-    def __hash__(self):
-        return hash(self.name)
-
-    def __eq__(self, other):
-        table = isinstance(other, Role) and self.name == other.name
-        enum = isinstance(other, RoleEnum) and self.name == other.value
-        return table or enum
+Element = Category | LinkButton | ScenarioButton

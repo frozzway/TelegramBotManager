@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import Annotated
 import secrets
 
-from fastapi import HTTPException, status, Depends, Response, Request
+from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import (
     JWTError,
@@ -13,9 +13,8 @@ from pydantic import ValidationError
 from sqlalchemy import select, delete
 
 from bot_manager import models, tables
-from bot_manager.services import UserServiceDp
 from bot_manager.settings import settings
-from bot_manager.database import ControllerSession
+from bot_manager.database import ManagerSession
 from bot_manager.roles import Role as RoleEnum
 from bot_manager.tables import RefreshSession
 
@@ -27,14 +26,14 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> models.UserJWT:
     return AuthService.verify_token(token)
 
 
-CurrentUser = Annotated[models.User, Depends(get_current_user)]
+CurrentUserDp = Annotated[models.UserJWT, Depends(get_current_user)]
 
 
 class AuthorizeRoles:
     def __init__(self, *roles: RoleEnum):
         self.roles = roles
 
-    def __call__(self, current_user: CurrentUser):
+    def __call__(self, current_user: CurrentUserDp):
         for role in current_user.roles:
             if role in self.roles:
                 return True
@@ -42,9 +41,8 @@ class AuthorizeRoles:
 
 
 class AuthService:
-    def __init__(self, session: ControllerSession, user_service: UserServiceDp):
+    def __init__(self, session: ManagerSession):
         self.session = session
-        self.user_service = user_service
 
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -81,7 +79,12 @@ class AuthService:
 
     @staticmethod
     def create_tokens(user: tables.User) -> models.Token:
-        user_data = models.UserJWT.model_validate(user, from_attributes=True)
+        user_data = models.UserJWT(
+            id=user.id,
+            roles=[r.name for r in user.roles],
+            bots_id=[b.id for b in user.bots],
+        )
+        user_data.roles = user.roles
         now = datetime.utcnow()
         payload = {
             'iat': now,
