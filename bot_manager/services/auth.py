@@ -84,7 +84,6 @@ class AuthService:
             roles=[r.name for r in user.roles],
             bots_id=[b.id for b in user.bots],
         )
-        user_data.roles = user.roles
         now = datetime.utcnow()
         payload = {
             'iat': now,
@@ -123,7 +122,7 @@ class AuthService:
             ip_address=host,
             user_agent=user_agent
         )
-        await self.session.add(refresh_session)
+        self.session.add(refresh_session)
         return refresh_session
 
     async def refresh_token(self, refresh_token: str, host: str, user_agent: str) -> models.Token:
