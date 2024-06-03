@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl, field_serializer
 
 
 __all__ = ['CategoryBase', 'Category', 'LinkButtonBase', 'LinkButton', 'ScenarioButton', 'Ownership']
@@ -20,6 +20,10 @@ class Category(CategoryBase):
 class LinkButtonBase(BaseModel):
     name: str = Field(description='Текст кнопки')
     url: HttpUrl = Field(description='Адрес URL')
+
+    @field_serializer('url')
+    def serialize_url(self, url: HttpUrl) -> str:
+        return str(url)
 
 
 class LinkButton(LinkButtonBase):
