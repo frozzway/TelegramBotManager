@@ -6,7 +6,7 @@ from bot_manager.services import AuthServiceDp
 from bot_manager.settings import settings
 
 
-router = APIRouter()
+router = APIRouter(tags=["Account"])
 
 
 @router.post("/login", response_model=models.Token)
