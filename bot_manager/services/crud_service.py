@@ -36,12 +36,15 @@ class CrudService:
 
     async def update(self, entity_id: int, model: Model) -> Table:
         entity = await self.get(entity_id)
-        for field in model.model_fields_set:
-            setattr(entity, field, getattr(model, field))
+        dumped_model = model.model_dump()
+        for field in dumped_model.keys():
+            new_value = dumped_model.get(field)
+            setattr(entity, field, new_value)
         await self.session.commit()
         return entity
 
     async def delete(self, entity_id: int) -> None:
+        await self.get(entity_id)
         stmt = delete(self.table).where(self.table.id == entity_id)
         await self.session.execute(stmt)
         await self.session.commit()
