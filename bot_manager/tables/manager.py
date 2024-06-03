@@ -7,29 +7,29 @@ from sqlalchemy.orm import mapped_column, relationship
 from bot_manager.roles import Role as RoleEnum
 
 
-__all__ = ['ControllerBase', 'Bot', 'User', 'RefreshSession', 'Role']
+__all__ = ['ManagerBase', 'Bot', 'User', 'RefreshSession', 'Role']
 
 
-class ControllerBase(DeclarativeBase):
+class ManagerBase(DeclarativeBase):
     pass
 
 
 user_role_table = Table(
     "UserRoles",
-    ControllerBase.metadata,
+    ManagerBase.metadata,
     Column("UserId", ForeignKey("Users.id")),
     Column("RoleId", ForeignKey("Roles.id")),
 )
 
 user_bot_table = Table(
     "UserBots",
-    ControllerBase.metadata,
+    ManagerBase.metadata,
     Column("UserId", ForeignKey("Users.id")),
     Column("BotId", ForeignKey("Bots.id")),
 )
 
 
-class Bot(ControllerBase):
+class Bot(ManagerBase):
     __tablename__ = 'Bots'
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -37,7 +37,7 @@ class Bot(ControllerBase):
     database: Mapped[str] = mapped_column()
 
 
-class User(ControllerBase):
+class User(ManagerBase):
     __tablename__ = 'Users'
     id: Mapped[int] = mapped_column(primary_key=True)
 
@@ -51,7 +51,7 @@ class User(ControllerBase):
     bots: Mapped[set['Bot']] = relationship(secondary=user_bot_table, lazy='selectin')
 
 
-class RefreshSession(ControllerBase):
+class RefreshSession(ManagerBase):
     __tablename__ = 'RefreshSessions'
     id: Mapped[int] = mapped_column(primary_key=True)
 
@@ -63,7 +63,7 @@ class RefreshSession(ControllerBase):
     user_agent: Mapped[str] = mapped_column()
 
 
-class Role(ControllerBase):
+class Role(ManagerBase):
     __tablename__ = 'Roles'
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column()

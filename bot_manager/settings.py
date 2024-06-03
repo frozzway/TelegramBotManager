@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     db_password: str = '123'
     db_host: str = 'localhost'
     db_port: str = '5432'
-    db_database: str = 'TelegramBotController'
+    db_database: str = 'TelegramBotManager'
 
     api_url: str = 'https://api.armgs.team/bot/v1'
 
