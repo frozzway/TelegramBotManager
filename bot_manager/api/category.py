@@ -17,11 +17,11 @@ async def get_category(category_id: int, service: CategoryServiceDp):
     return await service.get(category_id)
 
 
-@router.delete("/{category_id}", response_model=Category)
+@router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_category(category_id: int, service: CategoryServiceDp):
     if category_id == 1:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Нельзя удалить главную категорию")
-    return await service.delete(category_id)
+    await service.delete(category_id)
 
 
 @router.put("/{category_id}", response_model=Category)
