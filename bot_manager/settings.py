@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     jwt_expires_s: int = 60 * 30
     jwt_refresh_token_expires_s: int = 60 * 60 * 24 * 7
     jwt_cookie_name: str = 'BotController'
+    jwt_secret: str = 'a99ef8a3a0734e2d820dc323a29b787235ab7ec504a870ca0ff8c9df5f058042'
+    jwt_algorithm: str = 'HS256'
 
 
 settings = Settings(

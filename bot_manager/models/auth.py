@@ -21,7 +21,7 @@ class User(UserCreate):
 
 class UserJWT(BaseModel):
     id: int
-    roles: list[Role]
+    roles: list[str]
     bots_id: list[int]
 
 
@@ -31,5 +31,5 @@ class Token(BaseModel):
 
 
 class Login(BaseModel):
-    email: EmailStr
+    username: EmailStr
     password: str

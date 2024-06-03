@@ -1,14 +1,14 @@
 from typing import Annotated
 from typing import AsyncGenerator
 
-from fastapi import Cookie, Depends, HTTPException,status
+from fastapi import Cookie, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot_manager.services.auth import CurrentUserDp
 from bot_manager.engines import engines
 
 
-BotId = Annotated[str | None, Cookie()]
+BotId = Annotated[int | None, Cookie()]
 
 
 async def get_bot_session(bot_id: BotId, current_user: CurrentUserDp) -> AsyncGenerator[AsyncSession, None]:

@@ -19,7 +19,10 @@ class CrudService:
 
     async def get(self, entity_id: int) -> Table:
         stmt = select(self.table).where(self.table.id == entity_id)
-        return await self.session.scalar(stmt)
+        entity = await self.session.scalar(stmt)
+        if not entity:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        return entity
 
     async def get_all(self) -> list[Table]:
         stmt = select(self.table)
@@ -31,10 +34,8 @@ class CrudService:
         await self.session.commit()
         return entity
 
-    async def update(self, model: Model) -> Table:
-        entity = await self.get(model.id)
-        if not entity:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    async def update(self, entity_id: int, model: Model) -> Table:
+        entity = await self.get(entity_id)
         for field in model.model_fields_set:
             setattr(entity, field, getattr(model, field))
         await self.session.commit()

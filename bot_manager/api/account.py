@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Request, Response, HTTPException, status
+from fastapi import APIRouter, Request, Response, HTTPException, status, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 
 from bot_manager import models
 from bot_manager.services import AuthServiceDp
@@ -10,14 +11,14 @@ router = APIRouter()
 
 @router.post("/login", response_model=models.Token)
 async def login(
-    data: models.Login,
     request: Request,
     response: Response,
-    auth_service: AuthServiceDp
+    auth_service: AuthServiceDp,
+    auth_data: OAuth2PasswordRequestForm = Depends(),
 ):
     tokens = await auth_service.login(
-        email=data.email,
-        password=data.password,
+        email=auth_data.username,
+        password=auth_data.password,
         host=request.client.host,
         user_agent=request.headers.get('User-Agent'))
 

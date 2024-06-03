@@ -10,7 +10,7 @@ class CategoryBase(BaseModel):
     name: str = Field(description='Наименование категории (заголовок)')
     text: str | None = Field(default=None, description='Текст категории')
     tree_header: bool = Field(default=False, description='Флаг вывода наименования категории с наименованием родителя')
-    page_size: int | None = Field(default=None, gt=3, description='Количество кнопок на одной странице категории (при пагинации)')
+    page_size: int | None = Field(default=None, gt=2, description='Количество кнопок на одной странице категории (при пагинации)')
 
 
 class Category(CategoryBase):

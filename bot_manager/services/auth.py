@@ -19,7 +19,7 @@ from bot_manager.roles import Role as RoleEnum
 from bot_manager.tables import RefreshSession
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='api/auth/sign-in/')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login/')
 
 
 def get_current_user(token: str = Depends(oauth2_scheme)) -> models.UserJWT:
