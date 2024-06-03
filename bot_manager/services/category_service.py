@@ -1,5 +1,5 @@
 from bot_manager.services.crud_service import CrudService
-from bot_manager.services.db_dep import BotSession
+from bot_manager.services.db_dependency import BotSession
 from bot_manager import tables
 
 

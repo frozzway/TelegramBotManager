@@ -4,7 +4,7 @@ from typing import AsyncGenerator
 from fastapi import Cookie, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from bot_manager.services.auth import CurrentUserDp
+from bot_manager.services.auth_service import CurrentUserDp
 from bot_manager.engines import engines
 
 

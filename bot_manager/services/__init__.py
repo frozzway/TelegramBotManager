@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from bot_manager.services.auth import AuthService, CurrentUserDp
+from bot_manager.services.auth_service import AuthService, CurrentUserDp
 from bot_manager.services.category_service import CategoryService
 from bot_manager.services.user_service import UserService
 
