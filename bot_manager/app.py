@@ -27,5 +27,5 @@ async def create_tables():
         await conn.run_sync(ManagerBase.metadata.create_all)
 
 
-app = FastAPI(title='Сервис по взаимодействию с ArmGS', lifespan=lifespan)
+app = FastAPI(title='Сервис управления содержанием Telegram ботов', lifespan=lifespan)
 app.router.include_router(api_router)
