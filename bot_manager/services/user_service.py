@@ -1,9 +1,11 @@
+import secrets
+
 from fastapi import HTTPException, status
 from sqlalchemy import select
 
 from bot_manager.database import ManagerSession
-from bot_manager.models import UserJWT
-from bot_manager.services import AuthService
+from bot_manager.models import UserJWT, UserBase
+from bot_manager.services import AuthService, EmailService
 from bot_manager.services.crud_service import CrudService
 from bot_manager.roles import Role
 from bot_manager import tables
@@ -43,3 +45,15 @@ class UserService(CrudService):
         )
         self.session.add(admin)
         await self.session.commit()
+
+    async def create(self, model: UserBase) -> tables.User:
+        """Создать пользователя и отправить данные для входа на его email"""
+        user = tables.User(**model.model_dump())
+        password = secrets.token_urlsafe(12)
+        user.hashed_password = AuthService.hash_string(password)
+        async with self.session.begin():
+            self.session.add(user)
+            await self.session.flush()
+            await EmailService.send_registration_email(model.email, password)
+            await self.session.commit()
+        return user

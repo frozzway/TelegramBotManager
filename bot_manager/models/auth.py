@@ -1,21 +1,20 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, EmailStr
 
 from bot_manager.roles import Role
 
 
-__all__ = ['UserCreate', 'User', 'UserJWT', 'Token', 'Login']
+__all__ = ['UserBase', 'User', 'UserJWT', 'Token', 'Login']
 
 
-class UserCreate(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
+class UserBase(BaseModel):
+    email: EmailStr
     name: str
     middle_name: str
     surname: str
     roles: list[Role]
 
 
-class User(UserCreate):
+class User(UserBase):
     id: int
 
 
