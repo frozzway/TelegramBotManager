@@ -1,3 +1,7 @@
+from pathlib import Path
+
+from alembic.config import Config
+
 from pydantic_settings import BaseSettings
 
 
@@ -13,6 +17,7 @@ class Settings(BaseSettings):
     db_host: str = 'localhost'
     db_port: str = '5432'
     db_database: str = 'TelegramBotManager'
+    db_migrations_path: str = str(Path.cwd() / 'alembic_migrations')
 
     api_url: str = 'https://api.armgs.team/bot/v1'
 
@@ -33,3 +38,9 @@ settings = Settings(
     _env_file='.env',
     _env_file_encoding='utf-8',
 )
+
+alembic_config_path = Path(settings.db_migrations_path) / "alembic.ini"
+alembic_scripts_path = Path(settings.db_migrations_path) / "script"
+
+alembic_cfg = Config(alembic_config_path)
+alembic_cfg.set_main_option("script_location", str(alembic_scripts_path))
