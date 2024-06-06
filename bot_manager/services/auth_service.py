@@ -136,7 +136,7 @@ class AuthService:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token expired or invalid')
         user_id = refresh_session.user_id
         await self._remove_expired_sessions(user_id)
-        user = await self.session.scalar(select(tables.User).where(tables.User.id == user_id))
+        user = await self.session.scalar(select(tables.User).where(tables.User.id == user_id, tables.User.is_deleted.is_(False)))
         new_tokens = self.create_tokens(user)
         await self._create_refresh_session(new_tokens.refresh_token, user_id, host, user_agent)
         await self.session.commit()
@@ -144,7 +144,7 @@ class AuthService:
 
     async def login(self, email: str, password: str, host: str, user_agent: str) -> models.Token:
         exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials')
-        user = await self.session.scalar(select(tables.User).where(tables.User.email == email))
+        user = await self.session.scalar(select(tables.User).where(tables.User.email == email, tables.User.is_deleted.is_(False)))
         if not user or not self.verify_password(password, user.hashed_password):
             raise exception
         tokens = self.create_tokens(user)
