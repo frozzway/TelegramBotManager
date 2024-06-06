@@ -5,15 +5,16 @@ from sqlalchemy import select
 
 from bot_manager.database import ManagerSession
 from bot_manager.models import UserJWT, UserBase
-from bot_manager.services import AuthService, EmailService
+from bot_manager.services import AuthService, EmailService, CurrentUserDp
 from bot_manager.services.crud_service import CrudService
 from bot_manager.roles import Role
 from bot_manager import tables
 
 
 class UserService(CrudService):
-    def __init__(self, session: ManagerSession):
+    def __init__(self, session: ManagerSession, current_user: CurrentUserDp):
         super().__init__(session, tables.User)
+        self.current_user = current_user
 
     @staticmethod
     def has_bot_access(bot_id: int, current_user: UserJWT) -> bool:
@@ -57,3 +58,14 @@ class UserService(CrudService):
             await EmailService.send_registration_email(model.email, password)
             await self.session.commit()
         return user
+
+    async def delete(self, entity_id: int) -> None:
+        user: tables.User = await self.get(entity_id)
+        user.is_deleted = True
+        await self.session.commit()
+
+    async def get(self, entity_id: int) -> tables.User:
+        root_access = Role.Root in [Role(r) for r in self.current_user.roles]
+        if self.current_user.id == entity_id or root_access:
+            return await super().get(entity_id)
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)

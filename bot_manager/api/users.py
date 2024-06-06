@@ -19,6 +19,26 @@ async def set_bot(
         response.set_cookie('bot_id', str(bot_id))
 
 
-@router.post('', response_model=User, dependencies=[AuthorizeRoles(Role.Root)])
+@router.post('/', dependencies=[AuthorizeRoles(Role.Root)], response_model=User)
 async def create_user(data: UserBase, service: UserServiceDp):
     return await service.create(data)
+
+
+@router.delete('/{user_id}', dependencies=[AuthorizeRoles(Role.Root)], status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(user_id: int, service: UserServiceDp):
+    return await service.delete(user_id)
+
+
+@router.put('/{user_id}', dependencies=[AuthorizeRoles(Role.Root)], response_model=User)
+async def update_user(user_id: int, data: UserBase, service: UserServiceDp):
+    return await service.update(user_id, data)
+
+
+@router.get('/{user_id}', response_model=User)
+async def get_user(user_id: int, service: UserServiceDp):
+    return await service.get(user_id)
+
+
+@router.get('/', dependencies=[AuthorizeRoles(Role.Root)], response_model=list[User])
+async def get_all_users(service: UserServiceDp):
+    return await service.get_all()
