@@ -7,18 +7,22 @@ from alembic import context
 
 from bot_manager.tables import ManagerBase
 from bot_manager.database import url_params
+from bot_manager.settings import settings
 
 
 config = context.config
 
 url_object = URL.create(
     'postgresql+psycopg2',
+    database=settings.db_database,
     **url_params
 )
 
 
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
+
+config.set_main_option('sqlalchemy.url', str(url_object))
 
 
 target_metadata = ManagerBase.metadata
