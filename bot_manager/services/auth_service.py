@@ -30,14 +30,18 @@ CurrentUserDp = Annotated[models.UserJWT, Depends(get_current_user)]
 
 
 class AuthorizeRoles:
-    def __init__(self, *roles: RoleEnum):
-        self.roles = roles
+    @staticmethod
+    def construct_callable(*roles: RoleEnum):
+        def func(current_user: CurrentUserDp):
+            for role in current_user.roles:
+                if RoleEnum(role) in roles:
+                    return True
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        return func
 
-    def __call__(self, current_user: CurrentUserDp):
-        for role in current_user.roles:
-            if role in self.roles:
-                return True
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    def __new__(cls, *roles: RoleEnum):
+        callable_obj = AuthorizeRoles.construct_callable(*roles)
+        return Depends(callable_obj)
 
 
 class AuthService:
