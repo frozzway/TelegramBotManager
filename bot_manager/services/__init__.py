@@ -6,6 +6,7 @@ from bot_manager.services.elements_services import LinkButtonService, CategorySe
 from bot_manager.services.ownership_service import OwnershipService
 from bot_manager.services.auth_service import AuthService, CurrentUserDp
 from bot_manager.services.user_service import UserService
+from bot_manager.services.email_service import EmailService
 
 
 AuthServiceDp = Annotated[AuthService, Depends(AuthService)]
