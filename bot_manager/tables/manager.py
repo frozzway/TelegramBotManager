@@ -47,6 +47,8 @@ class User(ManagerBase):
     hashed_password: Mapped[str] = mapped_column()
     email: Mapped[str] = mapped_column()
 
+    is_deleted: Mapped[bool] = mapped_column(default=False)
+
     roles: Mapped[set['Role']] = relationship(secondary=user_role_table, lazy='selectin')
     bots: Mapped[set['Bot']] = relationship(secondary=user_bot_table, lazy='selectin')
 
