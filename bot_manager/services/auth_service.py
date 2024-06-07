@@ -8,7 +8,7 @@ from jose import (
     JWTError,
     jwt,
 )
-from passlib.hash import bcrypt
+import bcrypt
 from pydantic import ValidationError
 from sqlalchemy import select, delete
 
@@ -50,11 +50,16 @@ class AuthService:
 
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
-        return bcrypt.verify(plain_password, hashed_password)
+        password_byte_enc = plain_password.encode('utf-8')
+        hashed_password_byte_enc = hashed_password.encode('utf-8')
+        return bcrypt.checkpw(password_byte_enc, hashed_password_byte_enc)
 
     @staticmethod
     def hash_string(data: str) -> str:
-        return bcrypt.hash(data)
+        pwd_bytes = data.encode('utf-8')
+        salt = bcrypt.gensalt()
+        hashed_password = bcrypt.hashpw(password=pwd_bytes, salt=salt)
+        return hashed_password.decode('utf-8')
 
     @staticmethod
     def verify_token(token: str) -> models.UserJWT:
