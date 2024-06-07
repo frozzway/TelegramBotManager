@@ -16,7 +16,7 @@ async def lifespan(app: FastAPI):
     await create_engines()
     session_maker = app.dependency_overrides.get(get_manager_session, get_manager_session)()
     session = await anext(session_maker)
-    user_service = UserService(session)
+    user_service = UserService(session, None)
     await user_service.create_roles()
     await user_service.create_admin_account()
     yield
