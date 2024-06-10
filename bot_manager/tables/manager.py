@@ -1,16 +1,17 @@
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, Table, Column, TIMESTAMP
-from sqlalchemy.orm import Mapped, DeclarativeBase
+from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column, relationship
 
-from bot_manager.roles import Role as RoleEnum
+from bot_manager.tables import DeclarativeBaseWithId
 
 
 __all__ = ['ManagerBase', 'Bot', 'User', 'RefreshSession', 'Role']
 
 
-class ManagerBase(DeclarativeBase):
+class ManagerBase(DeclarativeBaseWithId):
+    __abstract__ = True
     pass
 
 
@@ -49,8 +50,8 @@ class User(ManagerBase):
 
     is_deleted: Mapped[bool] = mapped_column(default=False)
 
-    roles: Mapped[set['Role']] = relationship(secondary=user_role_table, lazy='selectin')
-    bots: Mapped[set['Bot']] = relationship(secondary=user_bot_table, lazy='selectin')
+    roles: Mapped[list['Role']] = relationship(secondary=user_role_table, lazy='selectin')
+    bots: Mapped[list['Bot']] = relationship(secondary=user_bot_table, lazy='selectin')
 
 
 class RefreshSession(ManagerBase):
@@ -69,11 +70,3 @@ class Role(ManagerBase):
     __tablename__ = 'Roles'
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column()
-
-    def __hash__(self):
-        return hash(self.name)
-
-    def __eq__(self, other):
-        table = isinstance(other, Role) and self.name == other.name
-        enum = isinstance(other, RoleEnum) and self.name == other.value
-        return table or enum
