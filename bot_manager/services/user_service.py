@@ -6,8 +6,8 @@ from sqlalchemy import select
 from bot_manager.database import ManagerSession
 from bot_manager.models import UserJWT, UserBase
 from bot_manager.services import AuthService, EmailService, CurrentUserDp
-from bot_manager.services.crud_service import CrudService
-from bot_manager.roles import Role
+from bot_manager.services.crud_service import CrudService, CRUDServiceExtended, CRUDConfiguration
+from bot_manager.roles import Role as RoleEnum
 from bot_manager import tables
 
 
@@ -15,6 +15,7 @@ class UserService(CrudService):
     def __init__(self, session: ManagerSession, current_user: CurrentUserDp):
         super().__init__(session, tables.User)
         self.current_user = current_user
+        self.crud_service = CRUDServiceExtended(session)
 
     @staticmethod
     def has_bot_access(bot_id: int, current_user: UserJWT) -> bool:
@@ -23,8 +24,8 @@ class UserService(CrudService):
         return True
 
     async def create_roles(self):
-        for role in Role:
-            if not await self.session.scalar(select(tables.Role).where(tables.Role.name == role.name)):
+        for role in RoleEnum:
+            if not await self.session.scalar(select(tables.Role).where(tables.Role.name == role.value)):
                 entity = tables.Role(name=role.value)
                 self.session.add(entity)
         await self.session.commit()
@@ -42,21 +43,32 @@ class UserService(CrudService):
             surname='Admin',
             email='administrator@localhost.ru',
             hashed_password=password_hash,
-            roles={root_role}
+            roles=[root_role]
         )
         self.session.add(admin)
         await self.session.commit()
 
     async def create(self, model: UserBase) -> tables.User:
         """Создать пользователя и отправить данные для входа на его email"""
-        user = tables.User(**model.model_dump())
+        config = CRUDConfiguration(allow_sub_create=False, allow_update=False)
+        self.crud_service.config = config
+
+        user = await self.crud_service.create(model, subsequent_call=False)
         password = secrets.token_urlsafe(12)
         user.hashed_password = AuthService.hash_string(password)
-        async with self.session.begin():
-            self.session.add(user)
-            await self.session.flush()
-            await EmailService.send_registration_email(model.email, password)
-            await self.session.commit()
+        self.session.add(user)
+        await self.session.flush()
+        await EmailService.send_registration_email(model.email, password)
+        await self.session.commit()
+        return user
+
+    async def update(self, entity_id: int, model: UserBase) -> tables.User:
+        config = CRUDConfiguration(allow_sub_create=False, allow_update=False)
+        self.crud_service.config = config
+
+        user = await self.get(entity_id)
+        user = await self.crud_service.update(model, user, subsequent_call=False)
+        await self.session.commit()
         return user
 
     async def delete(self, entity_id: int) -> None:
@@ -65,7 +77,7 @@ class UserService(CrudService):
         await self.session.commit()
 
     async def get(self, entity_id: int) -> tables.User:
-        root_access = Role.Root in [Role(r) for r in self.current_user.roles]
+        root_access = RoleEnum.Root in [RoleEnum(r) for r in self.current_user.roles]
         if self.current_user.id == entity_id or root_access:
             return await super().get(entity_id)
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)

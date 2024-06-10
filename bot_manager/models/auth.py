@@ -1,11 +1,27 @@
 from typing import Any, Iterable
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, PrivateAttr, ConfigDict
 
-from bot_manager.roles import Role
 from bot_manager import tables
 
 
-__all__ = ['UserBase', 'User', 'UserJWT', 'Token', 'Login']
+__all__ = ['UserBase', 'User', 'UserJWT', 'Token', 'Login', 'Role', 'Bot']
+
+
+class Role(BaseModel):
+    id: int
+    name: str
+
+    _table_class = PrivateAttr(tables.Role)
+    model_config = ConfigDict(from_attributes=True)
+
+
+class Bot(BaseModel):
+    id: int
+    name: str
+    database: str
+
+    _table_class = PrivateAttr(tables.Bot)
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserBase(BaseModel):
@@ -14,22 +30,13 @@ class UserBase(BaseModel):
     middle_name: str
     surname: str
     roles: list[Role]
+    bots: list[Bot]
+
+    _table_class = PrivateAttr(tables.User)
 
 
 class User(UserBase):
     id: int
-
-    # noinspection PyNestedDecorators
-    @field_validator('roles', mode='before')
-    @classmethod
-    def modify_role_types(cls, raw_value: Any):
-        result = []
-        if isinstance(raw_value, Iterable):
-            for role_entity in raw_value:
-                item = Role(role_entity.name) if isinstance(role_entity, tables.Role) else role_entity
-                result.append(item)
-            return result
-        return raw_value
 
 
 class UserJWT(BaseModel):
