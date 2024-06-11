@@ -29,4 +29,4 @@ def run_migrations():
 run_migrations()
 
 app = FastAPI(title='Сервис управления содержанием Telegram ботов', lifespan=lifespan)
-app.router.include_router(api_router)
+app.include_router(api_router)
