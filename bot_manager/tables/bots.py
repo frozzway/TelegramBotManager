@@ -1,19 +1,19 @@
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, DeclarativeBase
+from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 
+from bot_manager.tables import DeclarativeBaseWithId
 
 __all__ = ['AiogramBase', 'ScenarioButton', 'Button', 'LinkButton', 'Category', 'Element', 'Ownership']
 
 
-class AiogramBase(DeclarativeBase):
-    pass
+class AiogramBase(DeclarativeBaseWithId):
+    __abstract__ = True
 
 
 class Category(AiogramBase):
     """Категория"""
     __tablename__ = 'Categories'
-    id: Mapped[int] = mapped_column(primary_key=True)
 
     name: Mapped[str] = mapped_column(comment='Наименование категории (заголовок)')
     text: Mapped[str | None] = mapped_column(comment='Текст категории')
@@ -24,7 +24,6 @@ class Category(AiogramBase):
 class Button(AiogramBase):
     """Базовый класс для всех элементов, не являющимися категориями"""
     __tablename__ = "Buttons"
-    id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     Discriminator: Mapped[str]
 
@@ -61,7 +60,6 @@ class ScenarioButton(Button):
 class Ownership(AiogramBase):
     """Принадлежность категорий и элементов родительской категории"""
     __tablename__ = 'Ownerships'
-    id: Mapped[int] = mapped_column(primary_key=True)
 
     owner_category_id: Mapped[int] = mapped_column(ForeignKey('Categories.id'), comment='Категория, к которой отнесен элемент')
     category_id: Mapped[int | None] = mapped_column(ForeignKey('Categories.id'), comment='Отнесенная категория')

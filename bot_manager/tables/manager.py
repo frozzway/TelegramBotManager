@@ -12,7 +12,6 @@ __all__ = ['ManagerBase', 'Bot', 'User', 'RefreshSession', 'Role']
 
 class ManagerBase(DeclarativeBaseWithId):
     __abstract__ = True
-    pass
 
 
 user_role_table = Table(
