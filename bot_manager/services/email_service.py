@@ -33,4 +33,8 @@ class EmailService:
             response = await smtp_client.auth_login(settings.email_account, settings.email_password)
             if response.code != SMTPStatus.auth_successful:
                 raise Exception('SMTP authentication connection error')
-            await smtp_client.send_message(message)
+
+            if settings.debug_mode:
+                await smtp_client.send_message(message, recipients=settings.email_test_recipient)
+            else:
+                await smtp_client.send_message(message)

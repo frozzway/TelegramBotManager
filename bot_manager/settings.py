@@ -6,6 +6,8 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    debug_mode: bool = False
+
     project_name: str = 'BotManager'
 
     server_host: str = '0.0.0.0'
@@ -32,6 +34,7 @@ class Settings(BaseSettings):
     email_sender: str = f'no-reply@{hostname}'
     email_account: str = f'no-reply@{hostname}'
     email_password: str = 'JMBNsbvuhknasdf7124'
+    email_test_recipient: str = '<EMAIL>'
 
 
 settings = Settings(
