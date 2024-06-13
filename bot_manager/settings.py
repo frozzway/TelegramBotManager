@@ -25,14 +25,14 @@ class Settings(BaseSettings):
 
     jwt_expires_s: int = 60 * 30
     jwt_refresh_token_expires_s: int = 60 * 60 * 24 * 7
-    jwt_cookie_name: str = 'BotController'
+    jwt_cookie_name: str = 'BotManager'
     jwt_secret: str = 'a99ef8a3a0734e2d820dc323a29b787235ab7ec504a870ca0ff8c9df5f058042'
     jwt_algorithm: str = 'HS256'
 
     hostname: str = 'example.com'
-    email_server: str = f'mail.{hostname}'
-    email_sender: str = f'no-reply@{hostname}'
-    email_account: str = f'no-reply@{hostname}'
+    email_server: str = ''
+    email_sender: str = ''
+    email_account: str = ''
     email_password: str = 'JMBNsbvuhknasdf7124'
     email_test_recipient: str = '<EMAIL>'
 
@@ -41,6 +41,17 @@ settings = Settings(
     _env_file='.env',
     _env_file_encoding='utf-8',
 )
+
+autofill = {
+    'email_server': f'mail.{settings.hostname}',
+    'email_sender': f'no-reply@{settings.hostname}',
+    'email_account': f'no-reply@{settings.hostname}'
+}
+
+for key, value in autofill.items():
+    if not getattr(settings, key, None):
+        setattr(settings, key, value)
+
 
 alembic_config_path = Path(settings.db_migrations_path) / "alembic.ini"
 alembic_scripts_path = Path(settings.db_migrations_path) / "script"
