@@ -1,10 +1,9 @@
-from typing import Any, Iterable
 from pydantic import BaseModel, EmailStr, PrivateAttr, ConfigDict
 
 from bot_manager import tables
 
 
-__all__ = ['UserBase', 'User', 'UserJWT', 'Token', 'Login', 'Role', 'Bot']
+__all__ = ['UserBase', 'User', 'UserJWT', 'Token', 'Login', 'Role', 'Bot', 'UserCreate']
 
 
 class Role(BaseModel):
@@ -37,6 +36,10 @@ class UserBase(BaseModel):
 
 class User(UserBase):
     id: int
+
+
+class UserCreate(UserBase):
+    password: str
 
 
 class UserJWT(BaseModel):

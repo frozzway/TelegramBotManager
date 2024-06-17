@@ -1,9 +1,10 @@
 import aiosmtplib
+from datetime import datetime
 from aiosmtplib.typing import SMTPStatus
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from bot_manager.settings import settings
+from bot_manager.settings import settings, timezone
 
 
 class EmailService:
@@ -24,12 +25,14 @@ class EmailService:
         message['From'] = settings.email_sender
         message['To'] = email_to
         message['Subject'] = subject
+        message['Date'] = datetime.now(tz=timezone).strftime('%d.%m.%Y %H:%M:%S')
         plain_text_message = MIMEText(plain_body or body, "plain", "utf-8")
         html_message = MIMEText(body, "html", "utf-8")
         message.attach(plain_text_message)
         message.attach(html_message)
         smtp_client = aiosmtplib.SMTP(hostname=settings.email_server, use_tls=True)
         async with smtp_client:
+            await smtp_client.ehlo()
             response = await smtp_client.auth_login(settings.email_account, settings.email_password)
             if response.code != SMTPStatus.auth_successful:
                 raise Exception('SMTP authentication connection error')

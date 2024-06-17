@@ -1,4 +1,5 @@
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from alembic.config import Config
 
@@ -58,3 +59,5 @@ alembic_scripts_path = Path(settings.db_migrations_path) / "script"
 
 alembic_cfg = Config(alembic_config_path)
 alembic_cfg.set_main_option("script_location", str(alembic_scripts_path))
+
+timezone = ZoneInfo(settings.timezone)

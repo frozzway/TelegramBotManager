@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response, status
 
-from bot_manager.models import User, UserBase
+from bot_manager.models import User, UserBase, UserCreate
 from bot_manager.roles import Role
 from bot_manager.services import UserServiceDp, CurrentUserDp
 from bot_manager.services.auth_service import AuthorizeRoles
@@ -20,7 +20,7 @@ async def set_bot(
 
 
 @router.post('/', dependencies=[AuthorizeRoles(Role.Root)], response_model=User)
-async def create_user(data: UserBase, service: UserServiceDp):
+async def create_user(data: UserCreate, service: UserServiceDp):
     return await service.create(data)
 
 
