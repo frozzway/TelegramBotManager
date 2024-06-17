@@ -3,7 +3,7 @@ from pydantic import BaseModel, EmailStr, PrivateAttr, ConfigDict
 from bot_manager import tables
 
 
-__all__ = ['UserBase', 'User', 'UserJWT', 'Token', 'Login', 'Role', 'Bot', 'UserCreate']
+__all__ = ['UserBase', 'User', 'UserJWT', 'Token', 'Login', 'Role', 'Bot', 'BaseBot', 'UserCreate']
 
 
 class Role(BaseModel):
@@ -14,13 +14,16 @@ class Role(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class Bot(BaseModel):
-    id: int
+class BaseBot(BaseModel):
     name: str
     database: str
 
     _table_class = PrivateAttr(tables.Bot)
     model_config = ConfigDict(from_attributes=True)
+
+
+class Bot(BaseBot):
+    id: int
 
 
 class UserBase(BaseModel):
