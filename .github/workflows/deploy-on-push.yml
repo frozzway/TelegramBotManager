@@ -6,6 +6,9 @@ on:
     paths-ignore:
       - '**.md'
 
+env:
+  REPOSITORY_DIR: ${{ secrets.REPOSITORY_DIR }}
+
 jobs:
   main_job:
     runs-on: self-hosted
@@ -14,7 +17,7 @@ jobs:
     defaults:
       run:
         working-directory:
-          ${{ secrets.REPOSITORY_DIR }}
+          ${{ env.REPOSITORY_DIR }}
 
     steps:
       - name: Pull changes from repository
