@@ -2,7 +2,6 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from alembic.config import Config
-
 from pydantic_settings import BaseSettings
 
 
