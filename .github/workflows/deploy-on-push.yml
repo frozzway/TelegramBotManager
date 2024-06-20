@@ -8,20 +8,20 @@ on:
 
 env:
   REPOSITORY_DIR: ${{ secrets.REPOSITORY_DIR }}
+  COMPOSE_FILE_DIR: ${{ secrets.COMPOSE_FILE_DIR }}
 
 jobs:
   main_job:
     runs-on: self-hosted
     name: Main job
 
-    defaults:
-      run:
-        working-directory:
-          ${{ env.REPOSITORY_DIR }}
-
     steps:
       - name: Pull changes from repository
         run: git pull origin master
+        working-directory:
+          ${{ env.REPOSITORY_DIR }}
 
       - name: Up composition
         run: docker compose up --detach --force-recreate --build
+        working-directory:
+          ${{ env.COMPOSE_FILE_DIR }}
