@@ -6,15 +6,16 @@ on:
     paths-ignore:
       - '**.md'
 
-defaults:
-  run:
-    working-directory:
-      ${{ secrets.REPOSITORY_DIR }}
-
 jobs:
   main_job:
     runs-on: self-hosted
     name: Main job
+
+    defaults:
+      run:
+        working-directory:
+          ${{ secrets.REPOSITORY_DIR }}
+
     steps:
       - name: Pull changes from repository
         run: git pull origin master
