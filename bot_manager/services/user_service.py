@@ -1,3 +1,4 @@
+import json
 import secrets
 
 from fastapi import HTTPException, status
@@ -53,7 +54,7 @@ class UserService(CrudService):
         config = CRUDConfiguration(allow_sub_create=False, allow_update=False)
         self.crud_service.config = config
         password = model.password
-        model = UserBase.model_construct(**model.model_dump())
+        model = UserBase.model_validate_json(json.dumps(model.model_dump()))
         user = await self.crud_service.create(model, subsequent_call=False)
         user.hashed_password = AuthService.hash_string(password)
         self.session.add(user)
